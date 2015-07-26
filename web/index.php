@@ -32,13 +32,13 @@ $app->register(new Herrera\Pdo\PdoServiceProvider(),
 
 // Our web handlers
 
-$app->get('/db/', function() use($app) {
+$app->get('/', function() use($app) {
   $app['monolog']->addDebug('logging output.');
   //return "Hello Friends";
-  return str_repeat('Hello', getenv('TIMES'));
+  return str_repeat('Hello', getenv('TIMES')-10);
 });
 
-$app->get('/', function() use($app) {
+$app->get('/db/', function() use($app) {
   $st = $app['pdo']->prepare('SELECT name FROM test_table');
   $st->execute();
 
@@ -52,5 +52,12 @@ $app->get('/', function() use($app) {
     'names' => $names
   ));
 });
+
+$app->get('/twig/{name}', function($name) use($app) {
+  return $app['twig']->render('index.twig', array(
+    'name' => $name,
+  ));
+});
+
 
 $app->run();
