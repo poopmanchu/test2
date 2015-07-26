@@ -32,13 +32,13 @@ $app->register(new Herrera\Pdo\PdoServiceProvider(),
 
 // Our web handlers
 
-$app->get('/', function() use($app) {
+$app->get('/db/', function() use($app) {
   $app['monolog']->addDebug('logging output.');
   //return "Hello Friends";
   return str_repeat('Hello', getenv('TIMES'));
 });
 
-$app->get('/db/', function() use($app) {
+$app->get('/', function() use($app) {
   $st = $app['pdo']->prepare('SELECT name FROM test_table');
   $st->execute();
 
