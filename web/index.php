@@ -34,8 +34,8 @@ $app->register(new Herrera\Pdo\PdoServiceProvider(),
 
 $app->get('/', function() use($app) {
   $app['monolog']->addDebug('logging output.');
-  return "Hello Friends";
-  //return str_repeat('Hello', getenv('TIMES'));
+  //return "Hello Friends";
+  return str_repeat('Hello', getenv('TIMES'));
 });
 
 $app->get('/db/', function() use($app) {
