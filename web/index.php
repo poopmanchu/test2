@@ -1,46 +1,17 @@
 <?php
-require('../vendor/autoload.php');
-$app = new Silex\Application();
-$app['debug'] = true;
-// Register the monolog logging service
-$app->register(new Silex\Provider\MonologServiceProvider(), array(
-  'monolog.logfile' => 'php://stderr',
-));
-// Register the Twig templating engine
-$app->register(new Silex\Provider\TwigServiceProvider(), array(
-  'twig.path' => __DIR__.'/../views',
-));
-// Register the Postgres database add-on
-$dbopts = parse_url(getenv('DATABASE_URL'));
-$app->register(new Herrera\Pdo\PdoServiceProvider(),
-  array(
-    'pdo.dsn' => 'pgsql:dbname='.ltrim($dbopts["path"],'/').';host='.$dbopts["host"],
-    'pdo.port' => $dbopts["port"],
-    'pdo.username' => $dbopts["user"],
-    'pdo.password' => $dbopts["pass"]
-  )
-);
-// Our web handlers
-$app->get('/', function() use($app) {
-  $app['monolog']->addDebug('logging output.');
-  return 'Hello';
-});
-$app->get('/db/', function() use($app) {
-  $st = $app['pdo']->prepare('SELECT name FROM test_table');
-  $st->execute();
-  $names = array();
-  while ($row = $st->fetch(PDO::FETCH_ASSOC)) {
-    $app['monolog']->addDebug('Row ' . $row['name']);
-    $names[] = $row;
-  }
-  return $app['twig']->render('database.twig', array(
-    'names' => $names
-  ));
-});
-$app->get('/twig/{name}', function($name) use($app) {
-  return $app['twig']->render('index.twig', array(
-    'name' => $name,
-  ));
-});
-$app->run();
+# Include the Autoloader (see "Libraries" for install instructions)
+require 'vendor/autoload.php';
+use Mailgun\Mailgun;
+
+# Instantiate the client.
+$mgClient = new Mailgun('key-c48a6be15dee42e854dc57bcf7c05ca4');
+$domain = "sandbox12a6e644e12a43d4bd6bc11a3f899787.mailgun.org";
+
+# Make the call to the client.
+$result = $mgClient->sendMessage("$domain",
+                  array('from'    => 'Mailgun Sandbox <postmaster@sandbox12a6e644e12a43d4bd6bc11a3f899787.mailgun.org>',
+                        'to'      => 'Ben Gross <brgross@gmail.com>',
+                        'subject' => 'Hello Ben Gross',
+                        'text'    => 'Congratulations Ben Gross, you just sent an email with Mailgun!  You are truly awesome!  You can see a record of this email in your logs: https://mailgun.com/cp/log .  You can send up to 300 emails/day from this sandbox server.  Next, you should add your own domain so you can send 10,000 emails/month for free.'));
+    
 ?>
